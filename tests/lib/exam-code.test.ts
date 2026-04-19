@@ -8,7 +8,7 @@ describe('generateExamCode', () => {
   })
 
   it('반복 호출 시 다른 코드를 생성한다', () => {
-    const codes = new Set(Array.from({ length: 20 }, generateExamCode))
-    expect(codes.size).toBeGreaterThan(1)
+    const codes = new Set(Array.from({ length: 100 }, generateExamCode))
+    expect(codes.size).toBeGreaterThan(95)
   })
 })

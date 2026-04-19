@@ -6,10 +6,10 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: 'node',
+    environmentMatchGlobs: [['tests/components/**', 'jsdom']],
     setupFiles: ['./tests/setup.ts'],
     globals: true,
-    passWithNoTests: true,
   },
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
