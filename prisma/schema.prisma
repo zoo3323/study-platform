@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  name       String
+  password   String
+  isPaid     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  problems   Problem[]
+  exams      Exam[]
+  students   RegisteredStudent[]
+  typeGroups TypeGroup[]
+}
+
+model RegisteredStudent {
+  id        String @id @default(cuid())
+  teacherId String
+  name      String
+  teacher   User   @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, name])
+}
+
+model TypeGroup {
+  id        String        @id @default(cuid())
+  teacherId String
+  name      String
+  subject   String
+  isDefault Boolean       @default(false)
+  teacher   User          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  types     ProblemType[]
+}
+
+model ProblemType {
+  id       String    @id @default(cuid())
+  groupId  String
+  name     String
+  order    Int       @default(0)
+  group    TypeGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  problems Problem[]
+}
+
+model Problem {
+  id          String      @id @default(cuid())
+  teacherId   String
+  title       String
+  content     String
+  answer      String
+  typeId      String
+  inputMethod InputMethod @default(MANUAL)
+  ocrOriginal String?
+  createdAt   DateTime    @default(now())
+
+  teacher      User          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  type         ProblemType   @relation(fields: [typeId], references: [id])
+  examProblems ExamProblem[]
+  submissions  Submission[]
+}
+
+enum InputMethod {
+  MANUAL
+  OCR
+}
+
+model Exam {
+  id        String   @id @default(cuid())
+  teacherId String
+  title     String
+  date      DateTime
+  code      String   @unique
+  isOpen    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  teacher     User          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  problems    ExamProblem[]
+  submissions Submission[]
+  analyses    Analysis[]
+}
+
+model ExamProblem {
+  examId    String
+  problemId String
+  order     Int
+  exam      Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  problem   Problem @relation(fields: [problemId], references: [id])
+
+  @@id([examId, problemId])
+  @@index([examId, order])
+}
+
+model Submission {
+  id          String    @id @default(cuid())
+  examId      String
+  problemId   String
+  studentName String
+  answer      String
+  processNote String?
+  isCorrect   Boolean?
+  gradedAt    DateTime?
+  enteredBy   EnteredBy @default(STUDENT)
+  createdAt   DateTime  @default(now())
+
+  exam    Exam    @relation(fields: [examId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id])
+
+  @@unique([examId, problemId, studentName])
+  @@index([examId, studentName])
+}
+
+enum EnteredBy {
+  STUDENT
+  TEACHER
+}
+
+model Analysis {
+  id          String         @id @default(cuid())
+  examId      String
+  studentName String
+  status      AnalysisStatus @default(PENDING)
+  weakTypes   Json?
+  aiReport    Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  exam Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, studentName])
+}
+
+enum AnalysisStatus {
+  PENDING
+  GENERATING
+  DONE
+  FAILED
+}
