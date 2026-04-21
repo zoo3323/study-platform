@@ -247,3 +247,125 @@ cd ~/Desktop/njkim/study-platform
 ---
 
 *이 문서는 /office-hours 스킬로 생성되었습니다. 코드 구현은 포함하지 않습니다.*
+
+---
+
+## 비주얼 디자인 시스템
+
+> /design-consultation 세션 산출물 | 2026-04-21
+> 핵심 키워드: **신뢰감 — 전문 도구처럼 보여야**
+
+### Aesthetic Direction
+
+- **방향:** Industrial/Utilitarian — 데이터 우선, 장식 없음
+- **장식 수준:** Minimal — 타이포그래피와 공백이 전부
+- **분위기:** 학원 강사가 학부모에게 "AI로 분석했습니다"라고 자신 있게 말할 수 있는 전문성. Vercel·Linear 같은 프리미엄 개발자 도구의 언어.
+- **레이아웃:** 좌측 다크 사이드바 + 우측 화이트 콘텐츠 영역
+
+### Color
+
+```css
+/* Core */
+--sidebar:    #0F172A;   /* 딥 슬레이트 — 거의 검정, 프리미엄 신호 */
+--surface:    #FFFFFF;   /* 메인 콘텐츠 영역 */
+--bg:         #F8FAFC;   /* 페이지 배경 */
+--border:     #E2E8F0;   /* 구분선 */
+
+/* Brand */
+--primary:    #2563EB;   /* 프로페셔널 블루 — 버튼, 링크, active 상태 */
+--primary-h:  #1D4ED8;   /* hover */
+
+/* Semantic */
+--strong:     #10B981;   /* 초록 — 강점, 정답, 완료 */
+--weak:       #F97316;   /* 주황 — 약점, 경고 (빨강보다 덜 공격적) */
+
+/* Text */
+--text:       #0F172A;
+--text-sub:   #475569;
+--muted:      #64748B;
+```
+
+**색상 사용 원칙:**
+- `--weak` (주황)은 빨강 대신 약점에 사용 — 학부모 레포트에서 경고이지만 불안감 없이 전달
+- `--primary` (블루)는 행동 유도(버튼, 링크)에만 사용
+- 색상은 드물게 사용할수록 의미가 강해짐 — 배경/카드는 무채색 유지
+
+### Typography
+
+| 역할 | 폰트 | 굵기 | 크기 |
+|------|------|------|------|
+| 한글 전체 | Pretendard | 400/500/600/700 | 스케일 참고 |
+| 점수·백분율·숫자 | Geist Mono (또는 Courier New) | 700 | 26–28px |
+| UI 라벨 (영문) | Geist | 500–600 | 11–13px |
+
+**폰트 로딩:**
+```html
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+```
+
+**타이포그래피 스케일:**
+```
+페이지 제목:   Pretendard 700 · 22–24px · letter-spacing: -0.3px
+섹션 제목:    Pretendard 600 · 15–16px
+카드 제목:    Pretendard 600 · 13px
+본문:        Pretendard 400 · 13px · line-height: 1.7
+레이블:      Pretendard 600 · 11px · uppercase · letter-spacing: 0.4px · color: --muted
+점수 숫자:   Geist Mono 700 · 26–28px
+```
+
+### Spacing
+
+- **Base unit:** 8px
+- **Density:** Comfortable (빽빽하지도, 낭비되지도 않게)
+- **Scale:** `4 / 8 / 12 / 16 / 24 / 32 / 48 / 64` (px)
+- **Border radius:** sm: 4px, md: 6px, lg: 8px (둥글지 않게 — 전문 도구 느낌)
+
+### Layout
+
+- **사이드바:** 220px 고정, `#0F172A` 배경
+- **콘텐츠 헤더:** 56px, 1px border-bottom
+- **카드 패딩:** 18–20px
+- **페이지 패딩:** 24–28px
+- **그리드:** 4컬럼 stat cards, 2컬럼 main grid (chart + table)
+
+### Motion
+
+- **방향:** Minimal-functional — 이해를 돕는 전환만
+- **Easing:** ease-out (enter), ease-in (exit)
+- **Duration:** micro 100ms / short 200ms / medium 300ms
+- AI 분석 대기 상태: 진행률 표시 + 예상 시간 안내 (로딩 스피너 금지)
+
+### Component Conventions
+
+**버튼:**
+```
+Primary:  bg #2563EB · text white · radius 6px · padding 7px 14px
+Ghost:    bg transparent · border 1px #E2E8F0 · text --text-sub
+Danger:   bg #EF4444 · text white (삭제 등 비가역 작업만)
+```
+
+**배지:**
+```
+완료:     bg #DCFCE7 · text #166534 (초록 계열)
+진행 중:  bg #FEF3C7 · text #92400E (주황 계열)
+미채점:   bg #FEE2E2 · text #991B1B (빨강 계열)
+```
+
+**약점 태그:**
+```
+bg #FFF7ED · border 1px #FDBA74 · text #C2410C · 앞에 주황 도트
+```
+
+**강점 태그:**
+```
+bg #EFF6FF · border 1px #BFDBFE · text #1D4ED8 · 앞에 블루 도트
+```
+
+### Design Decisions Log
+
+| 날짜 | 결정 | 근거 |
+|------|------|------|
+| 2026-04-21 | 사이드바 #0F172A (거의 검정) | 한국 edu앱의 파란 사이드바 대신 프리미엄 도구 언어 채택 |
+| 2026-04-21 | 약점 색상 주황 (not 빨강) | 학부모 레포트에서 공격적이지 않게 약점 전달 |
+| 2026-04-21 | 점수 숫자 Geist Mono | "측정이지 마케팅이 아니다" 신호 — 신뢰감 증폭 |
+| 2026-04-21 | border-radius 최대 8px | 둥글지 않은 직선형 — 전문 도구 느낌 유지 |
