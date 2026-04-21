@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
     jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.isPaid = (user as { isPaid: boolean }).isPaid
+        token.isPaid = user.isPaid
       }
       return token
     },
