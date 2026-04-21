@@ -37,6 +37,8 @@ async function main() {
   console.log('Seed complete (types created per-teacher on register)')
 }
 
-main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect())
+if (require.main === module) {
+  main()
+    .catch(console.error)
+    .finally(() => prisma.$disconnect())
+}
